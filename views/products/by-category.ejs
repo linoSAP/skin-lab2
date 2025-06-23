@@ -1,0 +1,28 @@
+<%- include('../partials/header') %>
+
+<div class="container">
+    <h1>Produits par catégorie</h1>
+    
+    <div class="category-filter">
+        <% categories.forEach(category => { %>
+            <a href="/products/by-category/<%= category.id %>" 
+               class="btn <%= currentCategory == category.id ? 'active' : '' %>">
+                <%= category.name %>
+            </a>
+        <% }); %>
+    </div>
+
+    <div class="products-grid">
+        <% products.forEach(product => { %>
+            <div class="product-card">
+                <img src="/images/<%= product.image %>" alt="<%= product.name %>">
+                <h3><%= product.name %></h3>
+                <p><%= product.price %> XAF</p>
+                <p class="category-badge"><%= product.category_name %></p>
+                <a href="/products/<%= product.id %>" class="btn">Voir</a>
+            </div>
+        <% }); %>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

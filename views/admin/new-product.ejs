@@ -1,0 +1,48 @@
+<%- include('../partials/admin-header', { title: 'Nouveau Produit' }) %>
+
+<div class="admin-container">
+    <h1>Ajouter un nouveau produit</h1>
+    
+    <% if (error_msg && error_msg.length) { %>
+        <div class="alert alert-error"><%= error_msg %></div>
+    <% } %>
+
+    <form action="/admin/products" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="name">Nom du produit *</label>
+            <input type="text" id="name" name="name" 
+                   value="<%= typeof name !== 'undefined' ? name : '' %>" required>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description *</label>
+            <textarea id="description" name="description" required><%= typeof description !== 'undefined' ? description : '' %></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="price">Prix (XAF) *</label>
+            <input type="number" step="0.01" id="price" name="price" 
+                   value="<%= typeof price !== 'undefined' ? price : '' %>" required>
+        </div>
+
+        <div class="form-group">
+            <label for="category_id">Catégorie</label>
+            <select id="category_id" name="category_id" class="form-control" required>
+                <option value="">-- Sélectionnez une catégorie --</option>
+                <% categories.forEach(category => { %>
+                    <option value="<%= category.id %>"><%= category.name %></option>
+                <% }); %>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="image">Image</label>
+            <input type="file" id="image" name="image" accept="image/*">
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Enregistrer</button>
+            <a href="/admin/dashboard" class="btn btn-secondary">Annuler</a>
+        </div>
+    </form>
+</div>

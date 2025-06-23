@@ -1,0 +1,44 @@
+<%- include('../partials/admin-header') %>
+
+<div class="admin-container">
+    <h1>Tableau de bord</h1>
+    
+    <div class="admin-actions">
+        <a href="/admin/products/new" class="btn">Ajouter un produit</a>
+    </div>
+
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Image</th>
+                <th>Nom</th>
+                <th>Prix</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody> 
+            <% products.forEach(product => { %>
+                <tr>
+                    <td><%= product.id %></td>
+                    <td><img src="<%= product.image %>" alt="<%= product.name %>" class="admin-thumbnail"></td>
+                    
+
+                    <td><%= product.name %></td>
+                    <td><%= product.price.toLocaleString('fr-FR') %> XAF</td>
+                    <td>
+                        
+                            <a href="/admin/<%= product.id %>/edit" class="btn-sm">Éditer</a>
+                    
+                        
+                        <form action="/admin/<%= product.id %>/delete" method="post" class="inline-form">
+                            <button type="submit" class="btn-sm danger">Supprimer</button>
+                        </form>
+                    </td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+</div>
+
+<%- include('../partials/footer') %>

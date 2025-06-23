@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Skin Girl Lab - Des produits de soins dermatologiques validés par la science">
+    <title><%= typeof title !== 'undefined' ? title : 'Skin Girl Lab' %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/extras.css">
+    <link rel="icon" href="<%= icon || '/images/default-icon.ico' %>" type="image/x-icon">
+    <!-- Chargement conditionnel du CSS admin pour les pages concernées -->
+    <% if (typeof isAdminPage !== 'undefined' && isAdminPage) { %>
+        <link rel="stylesheet" href="/css/admin.css">
+    <% } %>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <a href="/">
+                    <img src="/images/LOGO.png" alt="Skin Girl Lab Logo" class="logo-icon">
+                    Skin Girl Lab
+                </a>
+            </div>
+            <nav>
+                <ul>
+                    <li>
+                        <a href="/" 
+                           class="<%= typeof currentPage !== 'undefined' && currentPage === 'home' ? 'active' : '' %>">
+                           Accueil
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/products" 
+                           class="<%= typeof currentPage !== 'undefined' && currentPage === 'products' ? 'active' : '' %>">
+                           Produits
+                        </a>
+                    </li>
+                    <% if (typeof currentUser !== 'undefined' && currentUser) { %>
+                        <li>
+                            <a href="/admin/dashboard" class="admin-link">
+                                Admin
+                            </a>
+                        </li>
+                    <% } %>
+                </ul>
+            
+            </nav>
+            <div class="mobile-menu-btn" aria-label="Menu mobile">☰</div>
+        </div>
+
+        <div class="floating-cart-btn" style="background-color: blueviolet;" id="floatingCartBtn">
+            <a href="/cart" class="cart-link">
+                <i class="fas fa-shopping-cart"></i>
+                <span id="floating-cart-count" style="color: white;">0</span>
+            </a>
+        </div>
+        
+   <script>
+     // Fonction pour mettre à jour le compteur
+     function updateCartCount() {
+    fetch('/cart/count')
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
+        .then(data => {
+            const countElement = document.getElementById('floating-cart-count');
+            if (countElement) {
+                countElement.textContent = data.distinctProducts || 0;
+            }
+        })
+        .catch(error => {
+            console.error('Error updating cart count:', error);
+            const countElement = document.getElementById('floating-cart-count');
+            if (countElement) countElement.textContent = '0';
+        });
+}
+
+function showNotification(message) {
+    const notification = document.createElement('div');
+    notification.className = 'notification';
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    // Afficher la notification
+    setTimeout(() => notification.classList.add('show'), 10);
+    
+    // Masquer et supprimer après 1 seconde
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 300);
+    }, 1000);
+}
+
+     
+     // Gestion de l'ajout au panier
+ 
+     document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('add-to-cart') || e.target.closest('.add-to-cart')) {
+        const btn = e.target.classList.contains('add-to-cart') ? e.target : e.target.closest('.add-to-cart');
+        const productId = btn.dataset.id;
+        const productName = btn.dataset.name;
+        const productPrice = btn.dataset.price;
+        const productImage = btn.dataset.image;
+
+        fetch('/cart/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                productId: productId,
+                name: productName,
+                price: parseFloat(productPrice),
+                image: productImage
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Mettre à jour le compteur avec la réponse du serveur
+                const countElement = document.getElementById('floating-cart-count');
+                if (countElement) {
+                    countElement.textContent = data.count;
+                }
+                showNotification(`${productName} ajouté au Pannier !`);
+                // Animation de feedback
+                const floatingBtn = document.getElementById('floatingCartBtn');
+                if (floatingBtn) {
+                    floatingBtn.classList.add('pulse');
+                    setTimeout(() => floatingBtn.classList.remove('pulse'), 500);
+                }
+            }
+        })
+        .catch(err => {
+            console.error('Erreur:', err);
+            // Optionnel: Afficher un message d'erreur à l'utilisateur
+        });
+    }
+});
+     
+     // Mettre à jour le compteur au chargement
+     document.addEventListener('DOMContentLoaded', updateCartCount);
+</script>
+
+        
+    </header>
+
+    <!-- Messages flash -->
+    <% if (typeof messages !== 'undefined' && messages.length) { %>
+        <div class="flash-messages">
+            <% messages.forEach(message => { %>
+                <div class="flash flash-<%= message.type %>">
+                    <%= message.text %>
+                </div>
+            <% }); %>
+        </div>
+    <% } %>
+    <main>
+
+        

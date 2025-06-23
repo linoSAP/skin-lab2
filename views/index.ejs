@@ -1,0 +1,34 @@
+<%- include('partials/header', { 
+    title: 'Accueil - Skin Girl Lab', 
+    currentPage: 'home', 
+    icon: '/images/ico.png' 
+  }) %>
+  
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>Des secrets de soin validés par la science</h1>
+                <p>Découvrez notre sélection de produits dermatologiques pour une peau saine et radieuse</p>
+                <a href="/products" class="btn">Découvrir nos produits</a>
+            </div>
+        </section>
+
+        <section class="featured-products">
+            <div class="container">
+                <h2>Nos produits phares</h2>
+                <div class="products-grid">
+                    <% featuredProducts.forEach(product => { %>
+                        <div class="product-card">
+                            <img src="<%= product.image %>" alt="<%= product.name %>">
+                            <h3><%= product.name %></h3>
+                            <p class="price"><%= product.price.toLocaleString('fr-FR') %> XAF</p>
+                            <a href="/products" class="btn">Voir tous les produits</a>
+                        </div>
+                    <% }); %>
+                </div>
+            </div>
+        </section>
+    </main>
+
+<%- include('partials/footer') %>

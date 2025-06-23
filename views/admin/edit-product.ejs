@@ -1,0 +1,54 @@
+<%- include('../partials/admin-header', { title: 'Éditer Produit' }) %>
+
+<div class="admin-container">
+    <h1>Éditer le produit</h1>
+    
+    <% if (error) { %>
+        <div class="alert alert-error"><%= error %></div>
+    <% } %>
+
+    <form action="/admin/<%= product.id %>/products" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="name">Nom du produit *</label>
+            <input type="text" id="name" name="name" 
+                   value="<%= product.name %>" required>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description *</label>
+            <textarea id="description" name="description" required><%= product.description %></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="price">Prix (XAF) *</label>
+            <input type="number" step="0.01" id="price" name="price" 
+                   value="<%= product.price %>" required>
+        </div>
+
+        <div class="form-group" style="visibility: hidden;">
+            <input type="text" id="category_id" name="category_id" 
+                   value="<%= product.category %>">
+        </div>
+
+        <div class="form-group">
+            <% if (product.image) { %>
+                <div class="current-image">
+                    <label>Image actuelle</label>
+                    <img src="<%= product.image %>" alt="<%= product.name %>" class="thumbnail">
+                    <input type="hidden" name="existingImage" value="<%= product.image %>">
+                    <label>
+                        <input type="checkbox" name="removeImage"> Supprimer l'image actuelle
+                    </label>
+                </div>
+            <% } %>
+            
+            <label for="image">Nouvelle image</label>
+            <input type="file" id="image" name="image" accept="image/*">
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Mettre à jour</button>
+            <a href="/admin/dashboard" class="btn btn-secondary">Annuler</a>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,15 @@
+.category-filter {
+    margin: 20px 0;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.category-badge {
+    background: #f0f0f0;
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-size: 0.8em;
+    display: inline-block;
+    margin: 5px 0;
+}
