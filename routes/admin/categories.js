@@ -10,7 +10,7 @@ router.get('/', ensureAuthenticated, (req, res) => {
         res.render('admin/categories', { 
             title: 'Gestion des catégories',
             categories,
-            currentUser: req.session.user
+            currentUser: req.appData.user
         });
     });
 });

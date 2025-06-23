@@ -3,8 +3,8 @@
 <div class="admin-container">
     <h1>Ajouter un nouveau produit</h1>
     
-    <% if (error_msg && error_msg.length) { %>
-        <div class="alert alert-error"><%= error_msg %></div>
+    <% if (error && error.length) { %>
+        <div class="alert alert-error"><%= error %></div>
     <% } %>
 
     <form action="/admin/products" method="POST" enctype="multipart/form-data">

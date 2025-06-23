@@ -14,7 +14,7 @@ console.log('[ADMIN ROUTES] Initialisation des routes admin');
 // Route GET /admin/dashboard
 router.get('/dashboard', ensureAuthenticated, (req, res, next) => {
     console.log('[GET /dashboard] Accès au dashboard admin');
-    console.log('[GET /dashboard] Session user:', req.session.user);
+    console.log('[GET /dashboard] Session user:', req.appData.user);
 
     Product.getAll((err, products) => {
         if (err) {
@@ -26,7 +26,7 @@ router.get('/dashboard', ensureAuthenticated, (req, res, next) => {
         res.render('admin/dashboard', {
             title: 'Tableau de bord',
             products,
-            currentUser: req.session.user
+            currentUser: req.appData.user
         });
     });
 });
@@ -35,7 +35,7 @@ router.get('/dashboard', ensureAuthenticated, (req, res, next) => {
 router.get('/products/new', ensureAuthenticated, (req, res) => {
     Category.getAll((err, categories) => {
         if (err) throw err;
-        
+
         res.render('admin/new-product', {
             title: 'Nouveau produit',
             product: {
@@ -46,13 +46,11 @@ router.get('/products/new', ensureAuthenticated, (req, res) => {
                 category: ''
             },
             categories: categories || [],
-            currentUser: req.session.user,
+            currentUser: req.appData.user,
             error: null
         });
     });
 });
-
-
 
 
 // Modifiez la route POST pour gérer les fichiers
@@ -74,11 +72,11 @@ router.post('/products', ensureAuthenticated, upload.single('image'), (req, res,
                     product: productData,
                     categories: categories || [],
                     error: 'Erreur lors de la création: ' + err.message,
-                    currentUser: req.session.user
+                    currentUser: req.appData.user
                 });
             });
         } else {
-            req.flash('success', 'Produit créé avec succès');
+            req.appData.flashMessages.push({ type: 'success', text: 'Produit créé avec succès' });
             res.redirect('/admin/dashboard');
         }
     });
@@ -92,14 +90,14 @@ router.get('/:id/edit', ensureAuthenticated, (req, res, next) => {
     Product.getById(req.params.id, (err, product) => {
         if (err || !product) {
             console.error(`Erreur recherche produit ${req.params.id}:`, err);
-            req.flash('error', 'Produit non trouvé');
+            req.appData.flashMessages.push({ type: 'error', text: 'Produit non trouvé' });
             return res.redirect('/admin/dashboard');
         }
 
         res.render('admin/edit-product', {
             title: 'Éditer produit',
             product,
-            currentUser: req.session.user,
+            currentUser: req.appData.user,
             error: null
         });
     });
@@ -122,12 +120,12 @@ router.post('/:id/products', ensureAuthenticated, upload.single('image'), (req, 
                 res.render('admin/edit-product', {
                     title: 'Éditer produit',
                     product: { ...product, ...updateData },
-                    error: req.flash('error', 'Erreur lors de la mise à jour'),
-                    currentUser: req.session.user
+                    error: req.appData.flashMessages.push({ type: 'error', text: 'Erreur lors de la mise à jour' }),
+                    currentUser: req.appData.user
                 });
             });
         } else {
-            req.flash('success', 'Produit mis à jour avec succès');
+            req.appData.flashMessages.push({ type: 'success', text: 'Produit mis à jour avec succès' });
             res.redirect('/admin/dashboard');
         }
     });
@@ -140,10 +138,10 @@ router.post('/:id/delete', ensureAuthenticated, (req, res, next) => {
     Product.delete(req.params.id, (err) => {
         if (err) {
             console.error(`Erreur suppression produit ${req.params.id}:`, err);
-            req.flash('error', 'Erreur lors de la suppression');
+            req.appData.flashMessages.push({ type: 'error', text: 'Erreur lors de la suppression' });
             return res.redirect('/admin/dashboard');
         }
-        req.flash('success', 'Produit supprimé avec succès');
+        req.appData.flashMessages.push({ type: 'success', text: 'Produit supprimé avec succès' });
         res.redirect('/admin/dashboard');
     });
 });

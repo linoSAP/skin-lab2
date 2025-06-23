@@ -1,129 +1,161 @@
-<%- include('partials/header', { title: 'Votre Panier - Skin Girl Lab', currentPage: 'cart',icon: '/images/ico.png'  }) %>
+<%- include('partials/header', { title: 'Votre Panier - Skin Girl Lab',
+currentPage: 'cart', icon: '/images/ico.png' }) %>
 
 <main>
-    <section class="cart-section">
-        <div class="container">
-            <h1>Votre panier</h1>
+  <section class="cart-section">
+    <div class="container">
+      <h1>Votre panier</h1>
 
-            <div id="cart-items">
-                <% if (cartItems.length === 0) { %>
-                    <p class="empty-cart-message">Votre panier est vide.</p>
-                <% } else { %>
-                    <% cartItems.forEach(item => { %>
-                        <div class="cart-item">
-                            <div class="item-image">
-                                <img src="<%= item.image %>" alt="<%= item.name %>">
-                            </div>
-                            <div class="item-details">
-                                <h3><%= item.name %></h3>
-                                <p class="price">
-                                    <%= item.price ? Number(item.price).toLocaleString('fr-FR') : '0' %> XAF
-                                </p>
-                                <div class="quantity-controls">
-                                    <button class="quantity-btn minus" data-id="<%= item.id %>">-</button>
-                                    <span class="quantity"><%= item.quantity %></span>
-                                    <button class="quantity-btn plus" data-id="<%= item.id %>">+</button>
-                                    <button class="remove-btn" data-id="<%= item.id %>">Supprimer</button>
-                                </div>
-                                <p class="item-total">
-                                    <%= (item.price * item.quantity).toLocaleString('fr-FR') %> XAF
-                                </p>
-                            </div>
-                        </div>
-                    <% }); %>
-                <% } %>
+      <div id="cart-items">
+        <% if (cartItems.length === 0) { %>
+        <p class="empty-cart-message">Votre panier est vide.</p>
+        <% } else { %> <% cartItems.forEach(item => { %>
+        <div class="cart-item" data-id="<%= item.id %>">
+          <div class="item-image">
+            <img src="<%= item.image %>" alt="<%= item.name %>" />
+          </div>
+          <div class="item-details">
+            <h3><%= item.name %></h3>
+            <p class="price">
+              <%= Number(item.price).toLocaleString('fr-FR') %> XAF
+            </p>
+            <div class="quantity-controls">
+              <button class="quantity-btn minus" data-id="<%= item.id %>">
+                -
+              </button>
+              <span class="quantity"><%= item.quantity %></span>
+              <button class="quantity-btn plus" data-id="<%= item.id %>">
+                +
+              </button>
+              <button class="remove-btn" data-id="<%= item.id %>">
+                Supprimer
+              </button>
             </div>
-
-            <% if (cartItems.length > 0) { %>
-                <div class="cart-summary">
-                    <h3>Résumé de la commande</h3>
-                    <div class="summary-row">
-                        <span>Sous-total</span>
-                        <span id="subtotal"><%= total.toLocaleString('fr-FR') %> XAF</span>
-                    </div>
-                    <div class="summary-row">
-                        <span>Livraison</span>
-                        <span>Gratuite</span>
-                    </div>
-                    <div class="summary-row total">
-                        <span>Total</span>
-                        <span id="total"><%= total.toLocaleString('fr-FR') %> XAF</span>
-                    </div>
-                    <a href="#" class="btn" id="checkout-btn">Commander via WhatsApp</a>
-                </div>
-            <% } %>
+            <p class="item-total">
+              <%= (item.price * item.quantity).toLocaleString('fr-FR') %> XAF
+            </p>
+          </div>
         </div>
-    </section>
+        <% }) %> <% } %>
+      </div>
 
-    <script>
-        document.addEventListener('click', function (e) {
-            const btn = e.target.closest('.quantity-btn') || e.target.closest('.remove-btn');
-            if (!btn) return;
+      <% if (cartItems.length > 0) { %>
+      <div class="cart-summary">
+        <h3>Résumé de la commande</h3>
+        <div class="summary-row">
+          <span>Sous-total</span>
+          <span id="subtotal"><%= total.toLocaleString('fr-FR') %> XAF</span>
+        </div>
+        <div class="summary-row">
+          <span>Livraison</span>
+          <span>Gratuite</span>
+        </div>
+        <div class="summary-row total">
+          <span>Total</span>
+          <span id="total"><%= total.toLocaleString('fr-FR') %> XAF</span>
+        </div>
+        <a href="#" class="btn" id="checkout-btn">Commander via WhatsApp</a>
+      </div>
+      <% } %>
+    </div>
+  </section>
 
-            const productId = btn.dataset.id;
-            let endpoint, body;
+  <script>
+    document.addEventListener("click", function (e) {
+      const btn =
+        e.target.closest(".quantity-btn") || e.target.closest(".remove-btn");
+      if (!btn) return;
 
-            if (btn.classList.contains('remove-btn')) {
-                endpoint = '/cart/remove';
-                body = { productId };
-            } else {
-                const action = btn.classList.contains('plus') ? 'increase' : 'decrease';
-                endpoint = '/cart/update';
-                body = { productId, action };
-            }
+      const productId = btn.dataset.id;
+      let endpoint;
+      const body = { productId };
 
-            fetch(endpoint, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(body)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload(); // Recharge la page pour mettre à jour
-                }
-            })
-            .catch(err => console.error('Erreur:', err));
+      if (btn.classList.contains("remove-btn")) {
+        if (!confirm("Voulez-vous vraiment supprimer ce produit ?")) return;
+        endpoint = "/cart/remove";
+      } else if (btn.classList.contains("plus")) {
+        endpoint = "/cart/plus";
+      } else if (btn.classList.contains("minus")) {
+        endpoint = "/cart/minus";
+      } else {
+        console.warn("Bouton non reconnu");
+        return;
+      }
+
+      btn.disabled = true;
+      fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            setTimeout(() => location.reload(), 150);
+          } else {
+            alert("Erreur: action impossible.");
+          }
+        })
+        .finally(() => {
+          btn.disabled = false;
+        })
+        .catch((err) => {
+          console.error("Erreur:", err);
+          alert("Une erreur est survenue");
+        });
+    });
+
+    async function sendWhatsAppOrder() {
+      try {
+        const response = await fetch("/cart/forsend");
+        const cartData = await response.json();
+
+        if (!cartData.items || cartData.items.length === 0) {
+          alert("Votre panier est vide !");
+          return;
+        }
+
+        let message =
+          "Bonjour, je souhaite passer une commande chez Skin Girl Lab:\n\n";
+        cartData.items.forEach((item) => {
+          message += `- ${item.name} (x${item.quantity}) : ${item.itemTotal} XAF\n`;
         });
 
-        async function sendWhatsAppOrder() {
-        try {
-            // Récupérer les données du panier via notre nouvelle route
-            const response = await fetch('/cart/forsend');
-            const cartData = await response.json();
-            
-            if (cartData.items.length === 0) {
-                alert('Votre panier est vide !');
-                return;
-            }
-            
-            // Construire le message
-            let message = "Bonjour, je souhaite passer une commande chez Skin Girl Lab:\n\n";
-            
-            cartData.items.forEach(item => {
-                message += `- ${item.name} (x${item.quantity}) : ${item.itemTotal} XAF\n`;
-            });
-            
-            message += `\nSous-total: ${cartData.subtotal.toFixed(2)} XAF\n`;
-            message += `Total: ${cartData.subtotal.toFixed(2)} XAF\n\n`;
-            message += "Merci !";
-            
-            const whatsappNumber = "+237695749209";
-            window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
-            
-        } catch (error) {
-            console.error('Erreur:', error);
-            alert("Une erreur s'est produite lors de la préparation de la commande");
-        }
+        message += `\nSous-total: ${Number(cartData.subtotal).toLocaleString(
+          "fr-FR"
+        )} XAF`;
+        message += `\nTotal: ${Number(cartData.subtotal).toLocaleString(
+          "fr-FR"
+        )} XAF\n\n`;
+        message += "Merci !";
+
+        const whatsappNumber = "237695749209"; // Sans +
+        window.open(
+          `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`,
+          "_blank"
+        );
+      } catch (error) {
+        console.error("Erreur:", error);
+        alert(
+          "Une erreur s'est produite lors de la préparation de la commande"
+        );
+      }
     }
 
-    document.getElementById('checkout-btn')?.addEventListener('click', function(e) {
+    function clearCartCookie() {
+  document.cookie = "app_data=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+}
+
+
+
+    document.getElementById("checkout-btn")
+      ?.addEventListener("click", function (e) {
         e.preventDefault();
         sendWhatsAppOrder();
-    });
-    </script>
+         clearCartCookie();
+
+      });
+  </script>
 </main>
 
 <%- include('partials/footer') %>
